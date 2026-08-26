@@ -21,5 +21,11 @@ int main() {
         printFrame(receivedFrame.value());
     }
 
+    std::optional<CANFrame> secondFrame = bus.receive();
+
+    if (!secondFrame.has_value()) {
+        std::cout << "CAN bus is empty." << std::endl;
+    }
+
     return 0;
 }
