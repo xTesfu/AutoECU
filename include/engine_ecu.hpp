@@ -6,4 +6,6 @@ class EngineECU : public ECU
 {
 public:
     EngineECU();
+
+    void process() override;
 };
