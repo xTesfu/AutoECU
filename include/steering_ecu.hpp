@@ -5,7 +5,7 @@
 class SteeringECU : public ECU
 {
 public:
-    SteeringECU();
+    SteeringECU(CANBus &bus);
 
     void process() override;
 };

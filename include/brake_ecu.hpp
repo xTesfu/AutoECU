@@ -5,7 +5,7 @@
 class BrakeECU : public ECU
 {
 public:
-    BrakeECU();
+    BrakeECU(CANBus &bus);
 
     void process() override;
 };

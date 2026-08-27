@@ -1,7 +1,7 @@
 #include "ecu.hpp"
 
-ECU::ECU(const std::string &name)
-    : name(name)
+ECU::ECU(const std::string &name, CANBus &bus)
+    : name(name), bus(bus)
 {
 }
 

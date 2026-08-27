@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-SteeringECU::SteeringECU()
-    : ECU("Steering ECU")
+SteeringECU::SteeringECU(CANBus &bus)
+    : ECU("Steering ECU", bus)
 {
 }
 

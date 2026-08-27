@@ -5,7 +5,12 @@
 class EngineECU : public ECU
 {
 public:
-    EngineECU();
+    EngineECU(CANBus &bus);
 
     void process() override;
+
+    void setRPM(uint16_t rpm);
+
+private:
+    uint16_t rpm;
 };
