@@ -1,14 +1,25 @@
 #include <iostream>
+#include <vector>
 
 #include "engine_ecu.hpp"
+#include "brake_ecu.hpp"
+#include "steering_ecu.hpp"
 
 int main()
 {
     EngineECU engine;
+    BrakeECU brake;
+    SteeringECU steering;
 
-    ECU *ecu = &engine;
+    std::vector<ECU *> ecus = {
+        &engine,
+        &brake,
+        &steering};
 
-    ecu->process();
+    for (ECU *ecu : ecus)
+    {
+        ecu->process();
+    }
 
     return 0;
 }
