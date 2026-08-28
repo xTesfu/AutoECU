@@ -2,10 +2,17 @@
 
 void CANBus::send(const CANFrame &frame)
 {
-    std::lock_guard<std::mutex> lock(mutex);
-    messages.push(frame);
+    std::vector<CANReceiver *> receiverList;
 
-    condition.notify_one();
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        receiverList = receivers;
+    }
+
+    for (CANReceiver *receiver : receiverList)
+    {
+        receiver->push(frame);
+    }
 }
 
 std::optional<CANFrame> CANBus::receive()
@@ -34,10 +41,26 @@ bool CANBus::empty() const
 
 void CANBus::shutdown()
 {
+    std::vector<CANReceiver *> receiverList;
+
     {
         std::lock_guard<std::mutex> lock(mutex);
+
         stopped = true;
+        receiverList = receivers;
+    }
+
+    for (CANReceiver *receiver : receiverList)
+    {
+        receiver->shutdown();
     }
 
     condition.notify_all();
+}
+
+void CANBus::registerReceiver(CANReceiver &receiver)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+
+    receivers.push_back(&receiver);
 }

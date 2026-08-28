@@ -14,7 +14,6 @@ int main()
     CANBus bus;
 
     EngineECU engine(bus);
-
     BrakeECU brake(bus);
     SteeringECU steering(bus);
 
@@ -49,6 +48,12 @@ int main()
             );
         } });
 
+    std::thread steeringThread([&]()
+                               {
+    while (running) {
+        steering.process();
+    } });
+
     std::this_thread::sleep_for(
         std::chrono::seconds(5));
 
@@ -57,8 +62,7 @@ int main()
 
     engineThread.join();
     brakeThread.join();
-
-    steering.process();
+    steeringThread.join();
 
     return 0;
 }
