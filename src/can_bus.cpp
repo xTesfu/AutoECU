@@ -1,5 +1,10 @@
 #include "can_bus.hpp"
 
+CANBus::CANBus(SocketCAN *socketCan)
+    : socketCan(socketCan)
+{
+}
+
 void CANBus::send(const CANFrame &frame)
 {
     std::vector<CANReceiver *> receiverList;
@@ -12,6 +17,11 @@ void CANBus::send(const CANFrame &frame)
     for (CANReceiver *receiver : receiverList)
     {
         receiver->push(frame);
+    }
+
+    if (socketCan != nullptr)
+    {
+        socketCan->send(frame);
     }
 }
 
@@ -63,4 +73,29 @@ void CANBus::registerReceiver(CANReceiver &receiver)
     std::lock_guard<std::mutex> lock(mutex);
 
     receivers.push_back(&receiver);
+}
+
+void CANBus::receiveFromSocketCAN()
+{
+    if (socketCan == nullptr)
+    {
+        return;
+    }
+
+    CANFrame frame;
+
+    if (socketCan->receive(frame))
+    {
+        std::vector<CANReceiver *> receiverList;
+
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            receiverList = receivers;
+        }
+
+        for (CANReceiver *receiver : receiverList)
+        {
+            receiver->push(frame);
+        }
+    }
 }

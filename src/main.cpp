@@ -8,10 +8,16 @@
 #include "engine_ecu.hpp"
 #include "brake_ecu.hpp"
 #include "steering_ecu.hpp"
+#include "vehicle_simulator.hpp"
+#include "socket_can.hpp"
 
 int main()
 {
-    CANBus bus;
+    // CANBus bus;
+    SocketCAN socketCan("vcan0");
+    CANBus bus(&socketCan);
+
+    VehicleSimulator simulator;
 
     EngineECU engine(bus);
     BrakeECU brake(bus);
@@ -21,37 +27,48 @@ int main()
 
     std::thread engineThread([&]()
                              {
-        int rpm = 1000;
+        auto nextCycle = std::chrono::steady_clock::now();
 
-        while (running) {
-            engine.setRPM(rpm);
+        while (running)
+        {
+            engine.updateFromVehicle(simulator.getState());
             engine.process();
+            
+            simulator.update();
 
-            rpm += 500;
+            nextCycle += std::chrono::milliseconds(500);
 
-            if (rpm > 3000) {
-                rpm = 1000;
-            }
-
-            std::this_thread::sleep_for(
-                std::chrono::milliseconds(500)
-            );
+            std::this_thread::sleep_until(nextCycle);
         } });
 
     std::thread brakeThread([&]()
                             {
+        auto nextCycle = std::chrono::steady_clock::now();
+
         while (running) {
             brake.process();
 
-            std::this_thread::sleep_for(
-                std::chrono::milliseconds(100)
-            );
+            nextCycle += std::chrono::milliseconds(100);
+
+            std::this_thread::sleep_until(nextCycle);
         } });
 
     std::thread steeringThread([&]()
                                {
+    auto nextCycle = std::chrono::steady_clock::now();
+
     while (running) {
         steering.process();
+
+        nextCycle += std::chrono::milliseconds(100);
+        std::this_thread::sleep_until(nextCycle);
+    } });
+
+    std::thread canReceiveThread([&]()
+                                 {
+    while (running)
+    {
+        bus.receiveFromSocketCAN();
     } });
 
     std::this_thread::sleep_for(
@@ -63,6 +80,7 @@ int main()
     engineThread.join();
     brakeThread.join();
     steeringThread.join();
+    canReceiveThread.join();
 
     return 0;
 }

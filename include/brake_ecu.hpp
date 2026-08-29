@@ -5,6 +5,12 @@
 
 class BrakeECU : public ECU
 {
+    enum class BrakeState
+    {
+        NORMAL,
+        HIGH_SPEED
+    };
+
 public:
     BrakeECU(CANBus &bus);
 
@@ -13,4 +19,5 @@ public:
 private:
     CANBus &bus;
     CANReceiver receiver;
+    BrakeState state;
 };

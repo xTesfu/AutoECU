@@ -5,6 +5,12 @@
 
 class SteeringECU : public ECU
 {
+    enum class SteeringState
+    {
+        NORMAL,
+        HIGH_SPEED
+    };
+
 public:
     SteeringECU(CANBus &bus);
 
@@ -13,4 +19,5 @@ public:
 private:
     CANBus &bus;
     CANReceiver receiver;
+    SteeringState state;
 };
