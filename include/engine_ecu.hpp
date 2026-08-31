@@ -18,4 +18,5 @@ private:
     CANBus &bus;
     uint16_t rpm;
     uint16_t vehicleSpeed;
+    uint16_t engineTemperature;
 };

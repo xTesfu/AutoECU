@@ -3,6 +3,7 @@
 #include "can_bus.hpp"
 #include "can_ids.hpp"
 #include "logger.hpp"
+#include "diagnostic_codes.hpp"
 
 SteeringECU::SteeringECU(CANBus &bus)
     : ECU("Steering ECU", bus), bus(bus), state(SteeringState::NORMAL)
@@ -47,6 +48,18 @@ void SteeringECU::process()
             else
             {
                 Logger::info("Steering ECU: Normal steering");
+            }
+
+            if (rpm >= 2500)
+            {
+                CANFrame diagnosticFrame;
+
+                diagnosticFrame.id = CANId::DIAGNOSTIC;
+                diagnosticFrame.dlc = 1;
+                diagnosticFrame.data[0] =
+                    DiagnosticCode::STEERING_SENSOR_FAULT;
+
+                bus.send(diagnosticFrame);
             }
         }
     }

@@ -4,6 +4,7 @@ VehicleSimulator::VehicleSimulator()
 {
     state.engineRPM = 1000;
     state.vehicleSpeed = 0;
+    state.engineTemperature = 80;
 }
 
 void VehicleSimulator::update()
@@ -17,6 +18,16 @@ void VehicleSimulator::update()
     {
         state.engineRPM += 500;
         state.vehicleSpeed += 10;
+    }
+
+    // Engine temperature
+    if (state.engineRPM >= 2500)
+    {
+        state.engineTemperature += 5;
+    }
+    else if (state.engineTemperature > 80)
+    {
+        state.engineTemperature -= 2;
     }
 }
 

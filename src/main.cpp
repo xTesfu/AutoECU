@@ -10,6 +10,7 @@
 #include "steering_ecu.hpp"
 #include "vehicle_simulator.hpp"
 #include "socket_can.hpp"
+#include "diagnostic_ecu.hpp"
 
 int main()
 {
@@ -22,6 +23,7 @@ int main()
     EngineECU engine(bus);
     BrakeECU brake(bus);
     SteeringECU steering(bus);
+    DiagnosticECU diagnostic(bus);
 
     std::atomic<bool> running{true};
 
@@ -64,6 +66,18 @@ int main()
         std::this_thread::sleep_until(nextCycle);
     } });
 
+    std::thread diagnosticThread([&]()
+                                 {
+    auto nextCycle = std::chrono::steady_clock::now();
+
+    while (running)
+    {
+        diagnostic.process();
+
+        nextCycle += std::chrono::milliseconds(100);
+        std::this_thread::sleep_until(nextCycle);
+    } });
+
     std::thread canReceiveThread([&]()
                                  {
     while (running)
@@ -80,6 +94,7 @@ int main()
     engineThread.join();
     brakeThread.join();
     steeringThread.join();
+    diagnosticThread.join();
     canReceiveThread.join();
 
     return 0;
