@@ -9,6 +9,21 @@ VehicleSimulator::VehicleSimulator()
 
 void VehicleSimulator::update()
 {
+    if (state.mode == VehicleMode::LIMP_HOME)
+    {
+        if (state.engineRPM < 2000)
+        {
+            state.engineRPM += 500;
+        }
+
+        if (state.vehicleSpeed < 30)
+        {
+            state.vehicleSpeed += 10;
+        }
+
+        return;
+    }
+
     if (state.engineRPM >= 3000)
     {
         state.engineRPM = 1000;
@@ -29,6 +44,12 @@ void VehicleSimulator::update()
     {
         state.engineTemperature -= 2;
     }
+}
+
+void VehicleSimulator::injectEngineOverheat()
+{
+    state.engineTemperature = 125;
+    state.mode = VehicleMode::LIMP_HOME;
 }
 
 const VehicleState &VehicleSimulator::getState() const

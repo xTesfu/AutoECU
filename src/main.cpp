@@ -12,13 +12,25 @@
 #include "socket_can.hpp"
 #include "diagnostic_ecu.hpp"
 
-int main()
+// int main()
+int main(int argc, char *argv[])
 {
     // CANBus bus;
     SocketCAN socketCan("vcan0");
     CANBus bus(&socketCan);
 
     VehicleSimulator simulator;
+
+    if (argc == 4 &&
+        std::string(argv[1]) == "fault" &&
+        std::string(argv[2]) == "inject" &&
+        std::string(argv[3]) == "engine-overheat")
+    {
+        simulator.injectEngineOverheat();
+
+        std::cout << "Fault injected: Engine overheating\n";
+        std::cout << "Vehicle mode: LIMP_HOME\n";
+    }
 
     EngineECU engine(bus);
     BrakeECU brake(bus);

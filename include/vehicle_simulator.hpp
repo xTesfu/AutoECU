@@ -11,6 +11,8 @@ public:
 
     const VehicleState &getState() const;
 
+    void injectEngineOverheat();
+
 private:
     VehicleState state;
 };
