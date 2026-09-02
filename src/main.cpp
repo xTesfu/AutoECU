@@ -12,10 +12,8 @@
 #include "socket_can.hpp"
 #include "diagnostic_ecu.hpp"
 
-// int main()
 int main(int argc, char *argv[])
 {
-    // CANBus bus;
     SocketCAN socketCan("vcan0");
     CANBus bus(&socketCan);
 
@@ -23,13 +21,29 @@ int main(int argc, char *argv[])
 
     if (argc == 4 &&
         std::string(argv[1]) == "fault" &&
-        std::string(argv[2]) == "inject" &&
-        std::string(argv[3]) == "engine-overheat")
+        std::string(argv[2]) == "inject")
     {
-        simulator.injectEngineOverheat();
 
-        std::cout << "Fault injected: Engine overheating\n";
-        std::cout << "Vehicle mode: LIMP_HOME\n";
+        std::string fault = argv[3];
+        if (fault == "engine-overheat")
+        {
+            simulator.injectEngineOverheat();
+
+            std::cout << "Fault injected: Engine overheating\n";
+            std::cout << "Vehicle mode: LIMP_HOME\n";
+        }
+        else if (fault == "brake-failure")
+        {
+            simulator.injectBrakeFailure();
+
+            std::cout << "Fault injected: Brake failure\n";
+        }
+        else if (fault == "steering-sensor")
+        {
+            simulator.injectSteeringSensorFailure();
+
+            std::cout << "Fault injected: Steering sensor failure\n";
+        }
     }
 
     EngineECU engine(bus);
@@ -45,7 +59,13 @@ int main(int argc, char *argv[])
 
         while (running)
         {
-            engine.updateFromVehicle(simulator.getState());
+            const VehicleState &vehicleState = simulator.getState();
+
+            engine.updateFromVehicle(vehicleState);
+            brake.updateFromVehicle(vehicleState);
+            steering.updateFromVehicle(vehicleState);
+
+            // engine.updateFromVehicle(simulator.getState());
             engine.process();
             
             simulator.update();

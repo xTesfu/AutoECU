@@ -61,6 +61,23 @@ void SteeringECU::process()
 
                 bus.send(diagnosticFrame);
             }
+
+            if (steeringSensorFailure)
+            {
+                CANFrame diagnosticFrame;
+
+                diagnosticFrame.id = CANId::DIAGNOSTIC;
+                diagnosticFrame.dlc = 1;
+                diagnosticFrame.data[0] =
+                    DiagnosticCode::STEERING_SENSOR_FAULT;
+
+                bus.send(diagnosticFrame);
+            }
         }
     }
+}
+
+void SteeringECU::updateFromVehicle(const VehicleState &vehicleState)
+{
+    steeringSensorFailure = vehicleState.steeringSensorFailure;
 }

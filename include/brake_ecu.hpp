@@ -2,6 +2,7 @@
 
 #include "ecu.hpp"
 #include "can_receiver.hpp"
+#include "vehicle_state.hpp"
 
 class BrakeECU : public ECU
 {
@@ -16,8 +17,12 @@ public:
 
     void process() override;
 
+    void updateFromVehicle(const VehicleState &state);
+
 private:
     CANBus &bus;
     CANReceiver receiver;
     BrakeState state;
+
+    bool brakeFailure = false;
 };

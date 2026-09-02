@@ -14,4 +14,6 @@ struct VehicleState
     uint16_t engineTemperature = 0;
 
     VehicleMode mode = VehicleMode::NORMAL;
+    bool brakeFailure = false;
+    bool steeringSensorFailure = false;
 };

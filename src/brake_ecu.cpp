@@ -64,6 +64,22 @@ void BrakeECU::process()
 
                 bus.send(diagnosticFrame);
             }
+
+            if (brakeFailure)
+            {
+                CANFrame diagnosticFrame;
+
+                diagnosticFrame.id = CANId::DIAGNOSTIC;
+                diagnosticFrame.dlc = 1;
+                diagnosticFrame.data[0] = DiagnosticCode::BRAKE_SYSTEM_FAULT;
+
+                bus.send(diagnosticFrame);
+            }
         }
     }
+}
+
+void BrakeECU::updateFromVehicle(const VehicleState &vehicleState)
+{
+    brakeFailure = vehicleState.brakeFailure;
 }

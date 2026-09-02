@@ -52,6 +52,16 @@ void VehicleSimulator::injectEngineOverheat()
     state.mode = VehicleMode::LIMP_HOME;
 }
 
+void VehicleSimulator::injectBrakeFailure()
+{
+    state.brakeFailure = true;
+}
+
+void VehicleSimulator::injectSteeringSensorFailure()
+{
+    state.steeringSensorFailure = true;
+}
+
 const VehicleState &VehicleSimulator::getState() const
 {
     return state;

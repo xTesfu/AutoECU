@@ -12,6 +12,8 @@ public:
     const VehicleState &getState() const;
 
     void injectEngineOverheat();
+    void injectBrakeFailure();
+    void injectSteeringSensorFailure();
 
 private:
     VehicleState state;
